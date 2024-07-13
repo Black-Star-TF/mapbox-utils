@@ -1,0 +1,54 @@
+{
+	"name": "mapbox-utils",
+	"description": "基于mapbox-gl的地图常用功能封装。",
+	"version": "1.0.0",
+	"main": "index.js",
+	"type": "module",
+	"scripts": {
+		"lint": "eslint ./src --ext .js,.ts --fix",
+		"prettier": "prettier --write ./src",
+		"build": "npm run lint && rollup -c && tsc -b ./tsconfig.type.json",
+		"prepare": "husky",
+		"lint-staged": "lint-staged"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Black-Star-TF/mapbox-utils.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Black-Star-TF/mapbox-utils/issues"
+	},
+	"homepage": "https://github.com/Black-Star-TF/mapbox-utils#readme",
+	"devDependencies": {
+		"@babel/core": "^7.24.7",
+		"@babel/plugin-external-helpers": "^7.24.7",
+		"@babel/plugin-transform-runtime": "^7.24.7",
+		"@babel/preset-env": "^7.24.7",
+		"@babel/preset-typescript": "^7.24.7",
+		"@rollup/plugin-babel": "^6.0.4",
+		"@rollup/plugin-commonjs": "^26.0.1",
+		"@rollup/plugin-node-resolve": "^15.2.3",
+		"@rollup/plugin-terser": "^0.4.4",
+		"@types/mapbox-gl": "^1.13.10",
+		"@typescript-eslint/eslint-plugin": "^7.15.0",
+		"@typescript-eslint/parser": "^7.15.0",
+		"eslint": "^8.57.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-prettier": "^5.1.3",
+		"husky": "^9.0.11",
+		"lint-staged": "^15.2.7",
+		"prettier": "^3.3.2",
+		"rollup": "^4.18.0",
+		"rollup-plugin-postcss": "^4.0.2",
+		"rollup-plugin-typescript": "^1.0.1",
+		"typescript": "^5.5.3"
+	},
+	"lint-staged": {
+		"*.{js,ts}": [
+			"eslint --fix",
+			"prettier --write"
+		]
+	}
+}

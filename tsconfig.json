@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "ES5",
+		"lib": ["ESNext", "DOM"],
+		"module": "ESNext",
+		"rootDir": ".",
+		"outDir": "dist",
+		"declaration": false,
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"skipLibCheck": true
+	},
+	"include": ["src/**/*.ts", "rollup.config.mjs"],
+	"exclude": ["node_modules", "dist"]
+}
