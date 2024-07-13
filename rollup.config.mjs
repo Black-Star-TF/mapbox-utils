@@ -7,7 +7,7 @@ import postcss from 'rollup-plugin-postcss'
 import fs from 'fs'
 const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'))
 export default {
-	input: 'src/index.ts',
+	input: 'src/rollup.entry.ts',
 	external: Object.keys(pkg.dependencies || {}),
 	output: [
 		{

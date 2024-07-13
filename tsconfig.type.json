@@ -10,5 +10,5 @@
 		"moduleResolution": "node"
 	},
 	"include": ["src/**/*.ts"],
-	"exclude": ["src/entry.ts"]
+	"exclude": ["src/rollup.entry.ts"]
 }
