@@ -1,14 +1,12 @@
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import babel from '@rollup/plugin-babel'
-import typescript from 'rollup-plugin-typescript'
+import typescript from 'rollup-plugin-typescript2'
 import terser from '@rollup/plugin-terser'
 import postcss from 'rollup-plugin-postcss'
-import fs from 'fs'
-const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'))
 export default {
 	input: 'src/rollup.entry.ts',
-	external: Object.keys(pkg.dependencies || {}),
+	external: ['@turf/turf'],
 	output: [
 		{
 			file: 'dist/mapbox-utils.cjs.js',
@@ -23,29 +21,29 @@ export default {
 		{
 			file: 'dist/mapbox-utils.min.js',
 			name: 'MapboxUtils',
-			format: 'umd',
+			format: 'iife',
 			sourcemap: true,
 			globals: {
-				'mapbox-gl': 'mapboxgl',
-				'@turf/turf': 'turf',
-				nanoid: 'nanoid'
+				'@turf/turf': 'turf'
 			}
 		}
 	],
 	plugins: [
-		commonjs({ extensions: ['.js', '.ts'] }),
-		resolve({ modulesOnly: true, extensions: ['js', 'ts'] }),
-		typescript(),
+		typescript({}),
+		resolve({ modulesOnly: true, extensions: ['js', 'ts'], browser: true }),
+		commonjs({
+			extensions: ['.js', '.ts']
+		}),
 		babel({
 			exclude: ['**/node_modules/**'],
 			babelHelpers: 'runtime',
 			extensions: ['js', 'ts']
 		}),
 		terser({
-			compress: {
-				drop_console: true,
-				drop_debugger: true
-			}
+			// compress: {
+			// 	drop_console: true,
+			// 	drop_debugger: true
+			// }
 		}),
 		postcss({
 			extract: 'mapbox-utils.css'

@@ -1,0 +1,3 @@
+.mapboxgl-map.mapbox-utils-point-layer .mapboxgl-canvas-container {
+	cursor: pointer !important;
+}

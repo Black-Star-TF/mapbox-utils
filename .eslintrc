@@ -19,6 +19,7 @@
 	"rules": {
 		"prettier/prettier": "error",
 		"quotes": ["error", "single"],
-		"semi": ["error", "never"]
+		"semi": ["error", "never"],
+		"@typescript-eslint/no-explicit-any": "off"
 	}
 }
