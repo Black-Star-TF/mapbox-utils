@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>PointLayer</title>
+
+		<script src="./lib/dat.gui/dat.gui.js"></script>
+		<link rel="stylesheet" href="./lib/dat.gui/dat.gui.css" />
+
+		<script src="./lib/mapbox-gl/mapbox-gl.js"></script>
+		<link rel="stylesheet" href="./lib/mapbox-gl/mapbox-gl.css" />
+
+		<script src="./lib/turf/turf.js"></script>
+		<script src="../dist/mapbox-utils.min.js"></script>
+		<link rel="stylesheet" href="../dist/mapbox-utils.css" />
+
+		<script src="./common/mapbox-style.js"></script>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				width: 100vw;
+				height: 100vh;
+			}
+			#map-container {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="map-container"></div>
+		<script>
+			const gui = new dat.GUI()
+			const option = {
+				mapStyle: 'Electronic',
+				addTo() {
+					pointLayer.addTo(map)
+				},
+				remove() {
+					pointLayer.remove()
+				},
+				setData() {
+					pointLayer.setData(getPointData())
+				}
+			}
+			gui
+				.add(option, 'mapStyle')
+				.options(['Electronic', 'Satellite'])
+				.onChange((val) => {
+					map.setStyle(mapStyles[option.mapStyle], {
+						diff: false
+					})
+				})
+				.name('style')
+			gui.add(option, 'addTo')
+			gui.add(option, 'remove')
+			gui.add(option, 'setData')
+
+			const map = new mapboxgl.Map({
+				container: 'map-container',
+				zoom: 10,
+				minZoom: 1,
+				maxZoom: 18,
+				center: [106.263683, 29.274074],
+				style: mapStyles[option.mapStyle]
+			})
+			const lineLayer = new MapboxUtils.LineLayer({
+				layerPool: {
+					default: {
+						type: 'line',
+						paint: {
+							'line-color': '#f00',
+							'line-width': 5
+						}
+					},
+					highlight: {
+						type: 'line',
+						paint: {
+							'line-color': '#0f0',
+							'line-width': 5
+						}
+					}
+				},
+				layers: ['default'],
+				highlightTrigger: 'click',
+				highlightLayers: ['highlight'],
+				fitBoundsOptions: true
+			})
+			lineLayer.addTo(map)
+			lineLayer.setData(getPointData())
+			console.log(map)
+
+			function getPointData() {
+				return turf.randomLineString(20, { bbox: [105, 29, 106, 30], max_length: 1 })
+			}
+		</script>
+	</body>
+</html>
