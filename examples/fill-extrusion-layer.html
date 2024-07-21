@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>LineLayer</title>
+		<title>FillExtrusionLayer</title>
 
 		<script src="./lib/dat.gui/dat.gui.js"></script>
 		<link rel="stylesheet" href="./lib/dat.gui/dat.gui.css" />
@@ -38,13 +38,13 @@
 			const option = {
 				mapStyle: 'Electronic',
 				addTo() {
-					lineLayer.addTo(map)
+					fillExtrusionLayer.addTo(map)
 				},
 				remove() {
-					lineLayer.remove()
+					fillExtrusionLayer.remove()
 				},
 				setData() {
-					lineLayer.setData(getData())
+					fillExtrusionLayer.setData(getData())
 				}
 			}
 			gui
@@ -68,50 +68,38 @@
 				center: [106.263683, 29.274074],
 				style: mapStyles[option.mapStyle]
 			})
-			const lineLayer = new MapboxUtils.LineLayer({
+			const fillExtrusionLayer = new MapboxUtils.FillExtrusionLayer({
 				layerPool: {
 					default: {
-						type: 'line',
+						type: 'fill-extrusion',
 						paint: {
-							'line-color': '#f00',
-							'line-width': 5,
-							'line-gradient': [
-								'interpolate',
-								['linear'],
-								['line-progress'],
-								0,
-								'blue',
-								0.1,
-								'royalblue',
-								0.3,
-								'cyan',
-								0.5,
-								'lime',
-								0.7,
-								'yellow',
-								1,
-								'red'
-							]
+							'fill-extrusion-color': '#f00',
+							'fill-extrusion-opacity': 0.5,
+							'fill-extrusion-height': 1000
 						}
 					},
 					highlight: {
-						type: 'line',
+						type: 'fill-extrusion',
 						paint: {
-							'line-color': '#0f0',
-							'line-width': 5
+							'fill-extrusion-color': '#f00',
+							'fill-extrusion-opacity': 0.8,
+							'fill-extrusion-height': 1000
 						}
 					}
 				},
 				layers: ['default'],
-				highlightTrigger: 'hover',
+				highlightTrigger: 'click',
 				highlightLayers: ['highlight'],
-				fitBoundsOptions: true,
-				lineMetrics: true
+				fitBoundsOptions: true
 			})
-			lineLayer.addTo(map)
-			lineLayer.setData(getData())
+			fillExtrusionLayer.addTo(map)
+			fillExtrusionLayer.setData(getData())
 			function getData() {
-				return turf.randomLineString(20, { bbox: [105, 29, 106, 30], max_length: 1 })
+				return turf.randomPolygon(20, {
+					bbox: [105, 29, 106, 30],
+					max_radial_length: 0.5,
+					num_vertices: 4
+				})
 			}
 		</script>
 	</body>

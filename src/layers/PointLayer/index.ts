@@ -1,21 +1,22 @@
 import type mapboxgl from 'mapbox-gl'
 import { isNotNull, getId } from '../../utils'
-import CanHighlighLayer, { getClusterFilters } from '../CanHighlighLayer'
-import type {
-	Options,
-	CommonEventType,
-	CommonEventMap,
-	EventFeatureData,
-	LayerType
-} from '../CanHighlighLayer'
-type PointLayerEventType = CommonEventType | 'cluster-click'
-interface PointLayerEventData extends CommonEventMap {
+import HighlightableLayer, { Options as HighlightableLayerOptions } from '../HighlightableLayer'
+import { DisabledProperty, EventType, Events as GeoJSONLayerEvents } from '../GeoJSONLayer'
+type LayerOption =
+	| Omit<mapboxgl.CircleLayer, DisabledProperty>
+	| Omit<mapboxgl.SymbolLayer, DisabledProperty>
+	| Omit<mapboxgl.LineLayer, DisabledProperty>
+	| Omit<mapboxgl.FillLayer, DisabledProperty>
+type LayerPool = Record<string, LayerOption>
+type PointLayerEventType = EventType | 'cluster-click'
+interface Events extends GeoJSONLayerEvents {
 	'cluster-click': {
-		cluster: Array<EventFeatureData>
+		cluster: Array<{ geometry: GeoJSON.Geometry; properties: any }>
 		originMapEvent: mapboxgl.MapMouseEvent
 	}
 }
-interface PointLayerOptions extends Options {
+interface Options extends HighlightableLayerOptions {
+	layerPool: LayerPool
 	cluster?: boolean
 	clusterLayers?: string[]
 	clusterMaxZoom?: number
@@ -23,14 +24,17 @@ interface PointLayerOptions extends Options {
 	clusterProperties?: any
 	clusterRadius?: number
 }
-export default class PointLayer extends CanHighlighLayer {
+export default class PointLayer extends HighlightableLayer {
 	private _clusterLayers: string[]
 	private _clusterMaxZoom?: number
 	private _clusterMinPoints?: number
 	private _clusterProperties?: any
 	private _clusterRadius?: number
-	constructor(options: PointLayerOptions) {
+	protected _cluster: boolean
+	protected declare _layerPool: LayerPool
+	constructor(options: Options) {
 		super(options)
+		this._layerPool = options.layerPool || {}
 		this._cluster = options.cluster || false
 		this._clusterLayers = options.clusterLayers?.slice() || []
 		this._clusterRadius = options.clusterRadius
@@ -48,10 +52,7 @@ export default class PointLayer extends CanHighlighLayer {
 			: []
 	}
 
-	on<T extends PointLayerEventType>(
-		type: T,
-		fn: (e: PointLayerEventData[T] & { type: T }) => void
-	) {
+	on<T extends PointLayerEventType>(type: T, fn: (e: Events[T] & { type: T }) => void) {
 		this._ev?.on(type, fn)
 	}
 
@@ -91,7 +92,7 @@ export default class PointLayer extends CanHighlighLayer {
 		}
 	}
 
-	protected getExtraLayers(): [string, LayerType, any[]][] {
+	protected getExtraLayers(): [string, LayerOption, any[]][] {
 		return this._cluster
 			? this._clusterLayers.map((layer) => {
 					return [
@@ -102,8 +103,28 @@ export default class PointLayer extends CanHighlighLayer {
 				})
 			: []
 	}
+
+	protected _getLayerFilters(highlightFilters: any[]) {
+		return [
+			...highlightFilters.map((item) => ['!', item]),
+			...getClusterFilters(this._cluster).map((item) => ['!', item]),
+			['==', ['geometry-type'], 'Point']
+		]
+	}
+
+	protected _getHighlightLayerFilters(highlightFilters: any[]) {
+		return [
+			...highlightFilters,
+			...getClusterFilters(this._cluster).map((item) => ['!', item]),
+			['==', ['geometry-type'], 'Point']
+		]
+	}
 }
 
 function getClusterLayerId(sourceId: string, layerId: string) {
 	return `${sourceId}-${layerId}-cluster`
+}
+
+function getClusterFilters(cluster: boolean): any[] {
+	return cluster ? [['all', ['has', 'cluster_id'], ['==', ['get', 'cluster'], true]]] : []
 }

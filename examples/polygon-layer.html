@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>PointLayer</title>
+		<title>PolygonLayer</title>
 
 		<script src="./lib/dat.gui/dat.gui.js"></script>
 		<link rel="stylesheet" href="./lib/dat.gui/dat.gui.css" />
@@ -44,7 +44,7 @@
 					polygonLayer.remove()
 				},
 				setData() {
-					polygonLayer.setData(getPointData())
+					polygonLayer.setData(getData())
 				}
 			}
 			gui
@@ -105,8 +105,8 @@
 				fitBoundsOptions: true
 			})
 			polygonLayer.addTo(map)
-			polygonLayer.setData(getPointData())
-			function getPointData() {
+			polygonLayer.setData(getData())
+			function getData() {
 				return turf.randomPolygon(20, {
 					bbox: [105, 29, 106, 30],
 					max_radial_length: 0.5,

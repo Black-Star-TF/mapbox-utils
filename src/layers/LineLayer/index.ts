@@ -1,24 +1,23 @@
 import type mapboxgl from 'mapbox-gl'
 import { getId } from '../../utils'
-import CanHighlighLayer from '../CanHighlighLayer'
-import type {
-	Options,
-	LayerOmitProperty,
-	CommonEventType,
-	CommonEventMap
-} from '../CanHighlighLayer'
-type LayerType = Omit<mapboxgl.LineLayer, LayerOmitProperty>
-type LayerPool = Record<string, LayerType>
-interface LineLayerOptions extends Options {
+import { DisabledProperty } from '../GeoJSONLayer'
+import HighlightableLayer, { Options as HighlightableLayerOptions } from '../HighlightableLayer'
+type LayerOption = Omit<mapboxgl.LineLayer, DisabledProperty>
+type LayerPool = Record<string, LayerOption>
+interface Options extends HighlightableLayerOptions {
 	layerPool: LayerPool
 }
-export default class LineLayer extends CanHighlighLayer {
-	constructor(options: LineLayerOptions) {
+export default class LineLayer extends HighlightableLayer {
+	constructor(options: Options) {
 		super(options)
 		this._sourceId = getId('line')
 	}
 
-	on<T extends CommonEventType>(type: T, fn: (e: CommonEventMap[T] & { type: T }) => void) {
-		this._ev?.on(type, fn)
+	protected _getLayerFilters(highlightFilters: any[]) {
+		return [...highlightFilters.map((item) => ['!', item]), ['==', ['geometry-type'], 'LineString']]
+	}
+
+	protected _getHighlightLayerFilters(highlightFilters: any[]) {
+		return [...highlightFilters, ['==', ['geometry-type'], 'LineString']]
 	}
 }

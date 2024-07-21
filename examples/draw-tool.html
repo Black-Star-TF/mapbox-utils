@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>DrawTool</title>
+
+		<script src="./lib/dat.gui/dat.gui.js"></script>
+		<link rel="stylesheet" href="./lib/dat.gui/dat.gui.css" />
+
+		<script src="./lib/mapbox-gl/mapbox-gl.js"></script>
+		<link rel="stylesheet" href="./lib/mapbox-gl/mapbox-gl.css" />
+
+		<script src="./lib/turf/turf.js"></script>
+		<script src="../dist/mapbox-utils.min.js"></script>
+		<link rel="stylesheet" href="../dist/mapbox-utils.css" />
+
+		<script src="./common/mapbox-style.js"></script>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				width: 100vw;
+				height: 100vh;
+			}
+			#map-container {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="map-container"></div>
+		<script>
+			const layers = [
+				{
+					id: 'mapbox-utils-draw-tool-point',
+					type: 'circle',
+					paint: {
+						'circle-color': '#fff',
+						'circle-stroke-color': '#0f0',
+						'circle-radius': 5,
+						'circle-stroke-width': 3
+					},
+					filter: ['==', '$type', 'Point']
+				},
+				{
+					id: 'mapbox-utils-draw-tool-line',
+					type: 'line',
+					paint: {
+						'line-color': '#0f0',
+						'line-width': 2
+					},
+					filter: ['==', '$type', 'LineString']
+				},
+				{
+					id: 'mapbox-utils-draw-tool-fill',
+					type: 'fill',
+					paint: {
+						'fill-color': '#f00',
+						'fill-opacity': 0.2
+					},
+					filter: ['==', '$type', 'Polygon']
+				}
+			]
+
+			const map = new mapboxgl.Map({
+				container: 'map-container',
+				zoom: 10,
+				minZoom: 1,
+				maxZoom: 18,
+				center: [106.263683, 29.274074],
+				style: mapStyles['Electronic']
+			})
+			const drawTool = new MapboxUtils.DrawTool({ layers })
+			drawTool.addTo(map)
+			drawTool.changeMode()
+		</script>
+	</body>
+</html>
