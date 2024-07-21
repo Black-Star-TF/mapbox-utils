@@ -5,12 +5,14 @@ import {
 	isNotNull,
 	nanoid,
 	getLayerId,
+	getCursorClass,
+	setCursorClass,
 	combineFilters,
 	queryRendererFeaturesBySource
 } from '../../utils'
 import Event from '../../utils/Event'
 import { bboxPolygon, bbox, featureCollection, feature } from '@turf/turf'
-const CURSOR_CLASS = 'mapbox-utils-layer-hover'
+const CURSOR_CLASS = getCursorClass('pointer')
 export type DisabledProperty = 'source' | 'source-layer' | 'id'
 type LayerType =
 	| mapboxgl.CircleLayer
@@ -133,7 +135,7 @@ export default class GeoJSONLayer {
 		if (this._map) {
 			this._handleEventListener('off')
 			this._removeSourceAndLayers()
-			this._setCursorClass(false)
+			setCursorClass(this._map, CURSOR_CLASS, false)
 		}
 		this._map = null
 		this._beforeId = undefined
@@ -163,15 +165,15 @@ export default class GeoJSONLayer {
 		return [...this.layerIds]
 	}
 
-	protected _setCursorClass(bool: boolean) {
-		if (!this._map) return
-		const hasCursorClass = this._map.getContainer().classList.contains(CURSOR_CLASS)
-		if (bool && !hasCursorClass) {
-			this._map.getContainer().classList.add(CURSOR_CLASS)
-		} else if (!bool && hasCursorClass) {
-			this._map.getContainer().classList.remove(CURSOR_CLASS)
-		}
-	}
+	// protected _setCursorClass(bool: boolean) {
+	// 	if (!this._map) return
+	// 	const hasCursorClass = this._map.getContainer().classList.contains(CURSOR_CLASS)
+	// 	if (bool && !hasCursorClass) {
+	// 		this._map.getContainer().classList.add(CURSOR_CLASS)
+	// 	} else if (!bool && hasCursorClass) {
+	// 		this._map.getContainer().classList.remove(CURSOR_CLASS)
+	// 	}
+	// }
 
 	protected _handleEventListener(type: 'on' | 'off') {
 		if (!this._map) return
@@ -235,9 +237,9 @@ export default class GeoJSONLayer {
 				this._ev?.fire('mouseenter', event)
 				this._isMouseOver = true
 			}
-			this._setCursorClass(true)
+			setCursorClass(this._map, CURSOR_CLASS, true)
 		} else {
-			this._setCursorClass(false)
+			setCursorClass(this._map, CURSOR_CLASS, false)
 		}
 	}
 
@@ -246,7 +248,7 @@ export default class GeoJSONLayer {
 			this._isMouseOver = false
 			this._ev?.fire('mouseleave')
 		}
-		this._setCursorClass(false)
+		this._map && setCursorClass(this._map, CURSOR_CLASS, false)
 	}
 
 	protected _getSourceOption(): mapboxgl.GeoJSONSourceRaw {

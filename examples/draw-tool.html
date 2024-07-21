@@ -36,15 +36,13 @@
 		<script>
 			const layers = [
 				{
-					id: 'mapbox-utils-draw-tool-point',
-					type: 'circle',
+					id: 'mapbox-utils-draw-tool-fill',
+					type: 'fill',
 					paint: {
-						'circle-color': '#fff',
-						'circle-stroke-color': '#0f0',
-						'circle-radius': 5,
-						'circle-stroke-width': 3
+						'fill-color': '#f00',
+						'fill-opacity': ['case', ['==', ['get', 'active'], true], 0.2, 0.4]
 					},
-					filter: ['==', '$type', 'Point']
+					filter: ['==', '$type', 'Polygon']
 				},
 				{
 					id: 'mapbox-utils-draw-tool-line',
@@ -56,15 +54,45 @@
 					filter: ['==', '$type', 'LineString']
 				},
 				{
-					id: 'mapbox-utils-draw-tool-fill',
-					type: 'fill',
+					id: 'mapbox-utils-draw-tool-point',
+					type: 'circle',
 					paint: {
-						'fill-color': '#f00',
-						'fill-opacity': 0.2
+						'circle-color': '#fff',
+						'circle-stroke-color': '#0f0',
+						'circle-radius': 5,
+						'circle-stroke-width': 3
 					},
-					filter: ['==', '$type', 'Polygon']
+					filter: ['==', '$type', 'Point']
 				}
 			]
+
+			const gui = new dat.GUI()
+			const option = {
+				mapStyle: 'Electronic',
+				drawMode: MapboxUtils.DrawTool.MODE.DRAW_POINT
+			}
+
+			gui
+				.add(option, 'mapStyle')
+				.options(['Electronic', 'Satellite'])
+				.onChange((val) => {
+					map.setStyle(mapStyles[option.mapStyle], {
+						diff: false
+					})
+				})
+				.name('style')
+
+			gui
+				.add(option, 'drawMode')
+				.options([
+					MapboxUtils.DrawTool.MODE.DRAW_POINT,
+					MapboxUtils.DrawTool.MODE.DRAW_LINE,
+					MapboxUtils.DrawTool.MODE.DRAW_POLYGON
+				])
+				.onChange((val) => {
+					drawTool.changeMode(val)
+				})
+				.name('DrawMode')
 
 			const map = new mapboxgl.Map({
 				container: 'map-container',
@@ -72,11 +100,12 @@
 				minZoom: 1,
 				maxZoom: 18,
 				center: [106.263683, 29.274074],
-				style: mapStyles['Electronic']
+				style: mapStyles[option.mapStyle]
 			})
 			const drawTool = new MapboxUtils.DrawTool({ layers })
 			drawTool.addTo(map)
-			drawTool.changeMode()
+			// drawTool.changeMode(MapboxUtils.DrawTool.MODE.DRAW_POINT)
+			drawTool.changeMode(option.drawMode)
 		</script>
 	</body>
 </html>

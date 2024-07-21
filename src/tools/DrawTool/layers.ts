@@ -31,7 +31,7 @@ const layers: Array<LayerOptions> = [
 		type: 'fill',
 		paint: {
 			'fill-color': '#f00',
-			'fill-opacity': 0.2
+			'fill-opacity': ['case', ['==', ['get', 'active'], true], 0.2, 0.4]
 		},
 		filter: ['==', '$type', 'Polygon']
 	}

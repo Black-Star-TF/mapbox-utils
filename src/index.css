@@ -1,0 +1,11 @@
+.mapboxgl-map.mapbox-utils-cursor-pointer .mapboxgl-canvas-container {
+	cursor: pointer !important;
+}
+
+.mapboxgl-map.mapbox-utils-cursor-crosshair .mapboxgl-canvas-container {
+	cursor: crosshair !important;
+}
+
+.mapboxgl-map.mapbox-utils-cursor-move .mapboxgl-canvas-container {
+	cursor: move !important;
+}

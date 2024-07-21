@@ -7,7 +7,7 @@ import PolygonLayer from './layers/PolygonLayer'
 import FillExtrusionLayer from './layers/FillExtrusionLayer'
 import DrawTool from './tools/DrawTool'
 import Track from './tools/Track'
-import './layers/GeoJSONLayer/index.css'
+import './index.css'
 export {
 	CustomLayer,
 	GeoJSONLayer,

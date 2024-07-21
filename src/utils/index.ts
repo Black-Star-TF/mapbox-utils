@@ -5,7 +5,9 @@ export const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 10)
 export function getId(type: string) {
 	return `mapbox-utils-${type}-${nanoid()}`
 }
-
+export function getCursorClass(type: string) {
+	return `mapbox-utils-cursor-${type}`
+}
 export function getLayerId(sourceId: string, layerId: string) {
 	return `${sourceId}-${layerId}`
 }
@@ -60,4 +62,13 @@ export function isNull(value: any) {
 
 export function isNotNull(value: any) {
 	return !isUndefined(value) && !isRealNull(value)
+}
+
+export function setCursorClass(map: mapboxgl.Map, cursorClass: string, bool: boolean) {
+	const hasCursorClass = map.getContainer().classList.contains(cursorClass)
+	if (bool && !hasCursorClass) {
+		map.getContainer().classList.add(cursorClass)
+	} else if (!bool && hasCursorClass) {
+		map.getContainer().classList.remove(cursorClass)
+	}
 }
