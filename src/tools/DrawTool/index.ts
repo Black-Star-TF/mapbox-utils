@@ -1,6 +1,6 @@
 import type mapboxgl from 'mapbox-gl'
 import Event from '../../utils/Event'
-import { getId, bindAll, nanoid } from '../../utils'
+import { getId, bindAll, nanoid, queryRendererFeaturesBySource } from '../../utils'
 import isClick from '../../utils/isClick'
 import isDblclick from '../../utils/isDblclick'
 import Mode from './modes/mode'
@@ -35,7 +35,24 @@ export default class DrawTool {
 		this._currentMode = null
 		this._mousedownInfo = undefined
 		this._clickInfo = undefined
-		bindAll(['_onStyleLoad', '_onMousedown', '_onMouseup', '_onMousemove', '_onDblclick'], this)
+		bindAll(
+			[
+				'_onStyleLoad',
+				'_onMousedown',
+				'_onMouseup',
+				'_onMousemove',
+				'_onDblclick',
+				'_onAdd',
+				'_onRender',
+				'_onMoveStart',
+				'_onMove',
+				'_onMoveEnd',
+				'_onSelect',
+				'_onUnselect',
+				'_onClearSelect'
+			],
+			this
+		)
 	}
 
 	changeMode(mode: keyof typeof ModeType) {
@@ -43,16 +60,15 @@ export default class DrawTool {
 		if (mode === this._currentModeType) return
 		this._currentModeType = mode
 		this._currentMode?.destroy()
-		this._currentMode = new Modes[this._currentModeType](this._map!)
-		this._currentMode.on('add', (e) => {
-			this._data.set(nanoid(), e.geometry)
-			this._updateFeatures()
-			this._render()
-		})
-
-		this._currentMode.on('render', (e) => {
-			this._render(e.features)
-		})
+		this._currentMode = new Modes[this._currentModeType](this._map!, this._data)
+		this._currentMode.on('add', this._onAdd)
+		this._currentMode.on('render', this._onRender)
+		this._currentMode.on('move-start', this._onMoveStart)
+		this._currentMode.on('move', this._onMove)
+		this._currentMode.on('move-end', this._onMoveEnd)
+		this._currentMode.on('select', this._onSelect)
+		this._currentMode.on('unselect', this._onUnselect)
+		this._currentMode.on('clear-select', this._onClearSelect)
 		this._render()
 	}
 
@@ -133,32 +149,72 @@ export default class DrawTool {
 	}
 
 	private _onMousedown(e: mapboxgl.MapMouseEvent) {
+		const feature = queryRendererFeaturesBySource(this._map!, this._sourceId, e.point)
 		this._mousedownInfo = {
 			timestamp: new Date().getTime(),
 			point: e.point
 		}
-		this._currentMode?.onMousedown(e)
+		this._currentMode?.onMousedown(e, feature)
 	}
 
 	private _onMouseup(e: mapboxgl.MapMouseEvent) {
+		const feature = queryRendererFeaturesBySource(this._map!, this._sourceId, e.point)
 		const mouseupInfo = {
 			timestamp: new Date().getTime(),
 			point: e.point
 		}
+		this._currentMode?.onMouseup(e, feature)
 		if (isClick(this._mousedownInfo!, mouseupInfo)) {
 			if (isDblclick(mouseupInfo, this._clickInfo)) {
 				this._clickInfo = undefined
-				this._currentMode?.onDblclick(e)
+				this._currentMode?.onDblclick(e, feature)
 			} else {
 				this._clickInfo = mouseupInfo
-				this._currentMode?.onClick(e)
+				this._currentMode?.onClick(e, feature)
 			}
-		} else {
-			this._currentMode?.onMouseup(e)
 		}
 	}
 
 	private _onMousemove(e: mapboxgl.MapMouseEvent) {
-		this._currentMode?.onMousemove(e)
+		const feature = queryRendererFeaturesBySource(this._map!, this._sourceId, e.point)
+		this._currentMode?.onMousemove(e, feature)
+	}
+
+	private _onAdd(e: { geometry: GeoJSON.Geometry }) {
+		this._data.set(nanoid(), e.geometry)
+		this._updateFeatures()
+		this._render()
+	}
+
+	private _onRender(e: { features: Array<GeoJSON.Feature> }) {
+		this._render(e.features)
+	}
+
+	private _onMoveStart(_e: { id: string }) {}
+
+	private _onMove(e: { id: string; geometry: GeoJSON.Geometry }) {
+		this._data.set(e.id, e.geometry)
+		this._updateFeatures()
+		this._render()
+	}
+
+	private _onMoveEnd(_e: { id: string; geometry: GeoJSON.Geometry }) {}
+
+	private _onSelect(e: { id: string }) {
+		this._map?.setFeatureState(
+			{
+				id: e.id,
+				source: this._sourceId
+			},
+			{ selected: true }
+		)
+	}
+
+	private _onUnselect(e: { id: string }) {
+		this._map?.removeFeatureState({ id: e.id, source: this._sourceId }, 'selected')
+	}
+
+	private _onClearSelect() {
+		this._map?.removeFeatureState({ source: this._sourceId })
 	}
 }

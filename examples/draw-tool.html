@@ -39,8 +39,15 @@
 					id: 'mapbox-utils-draw-tool-fill',
 					type: 'fill',
 					paint: {
-						'fill-color': '#f00',
-						'fill-opacity': ['case', ['==', ['get', 'active'], true], 0.2, 0.4]
+						'fill-color': '#3264f6',
+						'fill-opacity': [
+							'case',
+							['==', ['feature-state', 'selected'], true],
+							0.5,
+							['==', ['get', 'active'], true],
+							0.3,
+							0.1
+						]
 					},
 					filter: ['==', '$type', 'Polygon']
 				},
@@ -48,19 +55,26 @@
 					id: 'mapbox-utils-draw-tool-line',
 					type: 'line',
 					paint: {
-						'line-color': '#0f0',
-						'line-width': 2
+						'line-color': '#3264f6',
+						'line-width': [
+							'case',
+							['==', ['feature-state', 'selected'], true],
+							2,
+							['==', ['get', 'active'], true],
+							2,
+							1
+						]
 					},
-					filter: ['==', '$type', 'LineString']
+					filter: ['any', ['==', '$type', 'LineString'], ['==', '$type', 'Polygon']]
 				},
 				{
 					id: 'mapbox-utils-draw-tool-point',
 					type: 'circle',
 					paint: {
 						'circle-color': '#fff',
-						'circle-stroke-color': '#0f0',
-						'circle-radius': 5,
-						'circle-stroke-width': 3
+						'circle-stroke-color': '#3264f6',
+						'circle-radius': 3,
+						'circle-stroke-width': 2
 					},
 					filter: ['==', '$type', 'Point']
 				}
@@ -87,7 +101,11 @@
 				.options([
 					MapboxUtils.DrawTool.MODE.DRAW_POINT,
 					MapboxUtils.DrawTool.MODE.DRAW_LINE,
-					MapboxUtils.DrawTool.MODE.DRAW_POLYGON
+					MapboxUtils.DrawTool.MODE.DRAW_POLYGON,
+					MapboxUtils.DrawTool.MODE.DRAW_RECT,
+					MapboxUtils.DrawTool.MODE.DRAW_CIRCLE,
+					MapboxUtils.DrawTool.MODE.SELECT,
+					MapboxUtils.DrawTool.MODE.MOVE
 				])
 				.onChange((val) => {
 					drawTool.changeMode(val)

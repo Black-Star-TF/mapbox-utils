@@ -1,14 +1,14 @@
 import mapboxgl from 'mapbox-gl'
-import Mode from './mode'
+import Mode, { type Data } from './mode'
 import { point, polygon, lineString } from '@turf/turf'
-import { setCursorClass, getCursorClass } from '../../../utils'
-const CURSOR_CLASS = getCursorClass('crosshair')
+import { setCursorClass } from '../../../utils'
+import { CURSORS } from '../../../utils/constants'
 export default class DrawPolygon extends Mode {
 	private _vertices: Array<[number, number]>
 	private _currentVertex?: [number, number]
-	constructor(map: mapboxgl.Map) {
-		super(map)
-		setCursorClass(map, CURSOR_CLASS, true)
+	constructor(map: mapboxgl.Map, data: Data) {
+		super(map, data)
+		setCursorClass(map, CURSORS.CROSSHAIR, true)
 		this._vertices = []
 	}
 
@@ -56,7 +56,7 @@ export default class DrawPolygon extends Mode {
 		this._vertices = []
 		this._currentVertex = undefined
 		this._render()
-		this._map && setCursorClass(this._map, CURSOR_CLASS, false)
+		setCursorClass(this._map, CURSORS.CROSSHAIR, false)
 		super.destroy()
 	}
 }

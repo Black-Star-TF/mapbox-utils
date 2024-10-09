@@ -24,7 +24,7 @@ const layers: Array<LayerOptions> = [
 			'line-color': '#0f0',
 			'line-width': 2
 		},
-		filter: ['==', '$type', 'LineString']
+		filter: ['any', ['==', '$type', 'LineString'], ['==', '$type', 'Polygon']]
 	},
 	{
 		id: 'mapbox-utils-draw-tool-fill',

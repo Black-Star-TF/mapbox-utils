@@ -3,13 +3,12 @@ import {
 	isNotNull,
 	getId,
 	getLayerId,
-	getCursorClass,
 	setCursorClass,
 	combineFilters,
 	queryRendererFeaturesBySource
 } from '../../utils'
 import GeoJSONLayer, { Options as GeoJSONLayerOptions, DisabledProperty } from '../GeoJSONLayer'
-const CURSOR_CLASS = getCursorClass('pointer')
+import { CURSORS } from '../../utils/constants'
 const highlightTriggers = ['none', 'click', 'hover', 'manual'] as const
 type HighlightTrigger = (typeof highlightTriggers)[number]
 type LayerOption =
@@ -133,14 +132,14 @@ export default class HighlightableLayer extends GeoJSONLayer {
 			if (this._highlightTrigger === 'hover') {
 				this._setHighlight(feature.id)
 			}
-			setCursorClass(this._map, CURSOR_CLASS, true)
+			setCursorClass(this._map, CURSORS.POINTER, true)
 		} else if (this._isMouseOver) {
 			this._ev?.fire('mouseleave')
 			this._isMouseOver = false
 			if (this._highlightTrigger === 'hover') {
 				this._setHighlight(null)
 			}
-			setCursorClass(this._map, CURSOR_CLASS, false)
+			setCursorClass(this._map, CURSORS.POINTER, false)
 		}
 	}
 
@@ -152,7 +151,7 @@ export default class HighlightableLayer extends GeoJSONLayer {
 		if (this._highlightTrigger === 'hover') {
 			this._setHighlight(null)
 		}
-		this._map && setCursorClass(this._map, CURSOR_CLASS, false)
+		setCursorClass(this._map, CURSORS.POINTER, false)
 	}
 
 	private _setHighlight(val: any) {
